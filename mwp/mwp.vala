@@ -500,6 +500,8 @@ public class MWPlanner : Gtk.Application {
 
     private GPSStatus gps_status;
     private MSP_GPSSTATISTICS gpsstats;
+    private int magdt = -1;
+
 
     public DevManager devman;
 
@@ -3059,6 +3061,7 @@ public class MWPlanner : Gtk.Application {
             radstatus.annul();
             if (armed == 1)
             {
+                magdt = -1;
                 odo = {0};
                 odo.alt = -9999;
                 reboot_status();
@@ -5033,12 +5036,47 @@ public class MWPlanner : Gtk.Application {
                                 MWPLog.message("No home position yet\n");
                             }
                         }
+                        if(conf.experimental)
+                        {
+                            int gcse = (int)GPSInfo.cse;
+                            if(last_ltmf != 9 && last_ltmf != 15)
+                            {
+                                if(gf.speed > 3 &&
+                                   get_heading_diff(gcse, mhead).abs() > 45)
+                                {
+                                    if(magdt == -1)
+                                    {
+                                        magdt = (int)duration;
+                                        MWPLog.message("set mag %d %d %d\n",
+                                                       mhead, (int)gcse, magdt);
+                                    }
+                                }
+                                else if (magdt != -1)
+                                {
+                                    MWPLog.message("clear magdt %d %d %d\n",
+                                                   mhead, (int)gcse, magdt);
+                                    magdt = -1;
+                                }
+                            }
+                            else
+                                magdt = -1;
+
+                            if(magdt != -1 && ((int)duration - magdt) > 4)
+                            {
+                                MWPLog.message(" ****** Mag error detected %d %d %d\n",
+                                               mhead, (int)gcse, magdt);
+                                map_show_warning("COMPASS ANOMALY");
+                                bleet_sans_merci(Alert.RED);
+                                magdt = -1;
+                            }
+                        }
                     }
 
                     if(craft != null && fix > 0 && _nsats >= msats)
                     {
                         update_pos_info();
                     }
+
                     if(want_special != 0)
                         process_pos_states(GPSInfo.lat, GPSInfo.lon, gf.alt/100.0, "GFrame");
                 }
@@ -5471,6 +5509,20 @@ public class MWPlanner : Gtk.Application {
         }
         run_queue();
     }
+
+    private int get_heading_diff (int a, int b)
+    {
+        var diff = b - a;
+        var absdiff = diff.abs();
+
+        if (absdiff <= 180)
+            return absdiff == 180 ? absdiff : diff;
+        else if (b > a)
+            return absdiff - 360;
+        else
+            return 360 - absdiff;
+    }
+
 /*
     private void show_wp(MSP_WP w)
     {

@@ -489,5 +489,12 @@
       <description>If supplied, the application will be used to return the timezone (in preference to geonames.org). The application should take latitude and longitude as parameters. See samples/tzget.sh</description>
     </key>
 
+
+    <key name="enable-experimental" type ="b">
+      <default>false</default>
+       <summary>enable experimental features</summary>
+      <description>will vary</description>
+    </key>
+
   </schema>
 </schemalist>
