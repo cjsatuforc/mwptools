@@ -503,6 +503,7 @@ public class MWPlanner : Gtk.Application {
     private int magdt = -1;
     private int magtime=0;
     private int magdiff=0;
+    private bool magcheck;
 
     public DevManager devman;
 
@@ -894,6 +895,8 @@ public class MWPlanner : Gtk.Application {
     private void handle_replay_pause()
     {
         int signum;
+        magcheck = false;
+
         if(replay_paused)
         {
             signum = MwpSignals.Signal.CONT;
@@ -2253,6 +2256,7 @@ public class MWPlanner : Gtk.Application {
                 magdiff=int.parse(parts[0]);
                 magtime=int.parse(parts[1]);
                 MWPLog.message("Enabled anonaly checking %d⁰, %ds\n", magdiff,magtime);
+                magcheck = true;
             }
         }
     }
@@ -5048,7 +5052,7 @@ public class MWPlanner : Gtk.Application {
                                 MWPLog.message("No home position yet\n");
                             }
                         }
-                        if(magtime > 0 && magdiff > 0)
+                        if(magcheck && magtime > 0 && magdiff > 0)
                         {
                             int gcse = (int)GPSInfo.cse;
                             if(last_ltmf != 9 && last_ltmf != 15)
@@ -6925,6 +6929,7 @@ public class MWPlanner : Gtk.Application {
 
     private void cleanup_replay()
     {
+        magcheck = (magtime > 0 && magdiff > 0);
         MWPLog.message("============== Replay complete ====================\n");
         if (replayer == Player.MWP)
         {
@@ -6985,6 +6990,7 @@ public class MWPlanner : Gtk.Application {
             msp.open_fd(playfd[0],-1, true);
             set_replay_menus(false);
             set_menu_state("stop-replay", true);
+            magcheck = delay;
             switch(replayer)
             {
                 case Player.MWP:
@@ -7047,6 +7053,8 @@ public class MWPlanner : Gtk.Application {
 
     private void replay_bbox (bool delay, string? fn = null)
     {
+
+
         if(replayer == Player.BBOX)
         {
             Posix.kill(child_pid, MwpSignals.Signal.TERM);

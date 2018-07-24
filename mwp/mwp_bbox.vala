@@ -209,7 +209,7 @@ public class  BBoxDialog : Object
             string [] lines = {}; // for the error path
             size_t len = 0;
 
-            error.add_watch (IOCondition.IN, (source, condition) => {
+            error.add_watch (IOCondition.IN|IOCondition.HUP, (source, condition) => {
                     try
                     {
                         if (condition == IOCondition.HUP)
@@ -396,7 +396,7 @@ public class  BBoxDialog : Object
                                             out p_stderr);
 
             IOChannel error = new IOChannel.unix_new (p_stderr);
-            error.add_watch (IOCondition.IN, (source, condition) => {
+            error.add_watch (IOCondition.IN|IOCondition.HUP, (source, condition) => {
                     if (condition == IOCondition.HUP)
                         return false;
                     try
