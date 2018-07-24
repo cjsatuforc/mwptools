@@ -501,7 +501,8 @@ public class MWPlanner : Gtk.Application {
     private GPSStatus gps_status;
     private MSP_GPSSTATISTICS gpsstats;
     private int magdt = -1;
-
+    private int magtime=0;
+    private int magdiff=0;
 
     public DevManager devman;
 
@@ -2242,6 +2243,17 @@ public class MWPlanner : Gtk.Application {
         {
             autocon_cb.active=true;
             mkcon = true;
+        }
+
+        if(conf.experimental.length > 0)
+        {
+            var parts=conf.experimental.split(",");
+            if (parts.length == 2)
+            {
+                magdiff=int.parse(parts[0]);
+                magtime=int.parse(parts[1]);
+                MWPLog.message("Enabled anonaly checking %d⁰, %ds\n", magdiff,magtime);
+            }
         }
     }
 
@@ -5036,32 +5048,33 @@ public class MWPlanner : Gtk.Application {
                                 MWPLog.message("No home position yet\n");
                             }
                         }
-                        if(conf.experimental)
+                        if(magtime > 0 && magdiff > 0)
                         {
                             int gcse = (int)GPSInfo.cse;
                             if(last_ltmf != 9 && last_ltmf != 15)
                             {
-                                if(gf.speed > 3 &&
-                                   get_heading_diff(gcse, mhead).abs() > 45)
+                                if(gf.speed > 3)
                                 {
-                                    if(magdt == -1)
+                                    if(get_heading_diff(gcse, mhead).abs() > magdiff)
                                     {
-                                        magdt = (int)duration;
-                                        MWPLog.message("set mag %d %d %d\n",
-                                                       mhead, (int)gcse, magdt);
+                                        if(magdt == -1)
+                                        {
+                                            magdt = (int)duration;
+//                                            MWPLog.message("set mag %d %d %d\n", mhead, (int)gcse, magdt);
+                                        }
+                                    }
+                                    else if (magdt != -1)
+                                    {
+//                                        MWPLog.message("clear magdt %d %d %d\n", mhead, (int)gcse, magdt);
+                                        magdt = -1;
                                     }
                                 }
-                                else if (magdt != -1)
-                                {
-                                    MWPLog.message("clear magdt %d %d %d\n",
-                                                   mhead, (int)gcse, magdt);
+                                else
                                     magdt = -1;
-                                }
-                            }
-                            else
-                                magdt = -1;
 
-                            if(magdt != -1 && ((int)duration - magdt) > 4)
+                            }
+
+                            if(magdt != -1 && ((int)duration - magdt) > magtime)
                             {
                                 MWPLog.message(" ****** Mag error detected %d %d %d\n",
                                                mhead, (int)gcse, magdt);

@@ -94,7 +94,7 @@ public class MWPSettings : GLib.Object
     public string blackbox_decode {get; set; default="blackbox_decode";}
     public string geouser {get; set; default=null;}
     public string zone_detect {get; set; default=null;}
-    public bool experimental {get; set; default=false;}
+    public string experimental {get; set; default="";}
     public signal void settings_update (string s);
 
     public MWPSettings()
@@ -342,8 +342,8 @@ public class MWPSettings : GLib.Object
                 zone_detect = null;
         }
 
-        if(s == null || s == "enable-experimental")
-            experimental = settings.get_boolean("enable-experimental");
+        if(s == null || s == "experimental")
+            experimental = settings.get_string("experimental");
     }
 
     public void save_pane()
