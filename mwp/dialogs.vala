@@ -2022,6 +2022,15 @@ public class AudioThread : Object {
                                     s = "Landed";
                                     break;
                                 case 11:
+                                    s = "Settling before land";
+                                    break;
+                                case 12:
+                                    s = "Starting descent";
+                                    break;
+                                case 13:
+                                    s = "Hover above home";
+                                    break;
+                                case 14:
                                     s = "Emergency landing";
                                     break;
                             }
