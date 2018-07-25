@@ -2248,14 +2248,14 @@ public class MWPlanner : Gtk.Application {
             mkcon = true;
         }
 
-        if(conf.experimental.length > 0)
+        if(conf.mag_sanity != null)
         {
-            var parts=conf.experimental.split(",");
+            var parts=conf.mag_sanity.split(",");
             if (parts.length == 2)
             {
                 magdiff=int.parse(parts[0]);
                 magtime=int.parse(parts[1]);
-                MWPLog.message("Enabled anonaly checking %d⁰, %ds\n", magdiff,magtime);
+                MWPLog.message("Enabled mag anonaly checking %d⁰, %ds\n", magdiff,magtime);
                 magcheck = true;
             }
         }

@@ -94,7 +94,9 @@ public class MWPSettings : GLib.Object
     public string blackbox_decode {get; set; default="blackbox_decode";}
     public string geouser {get; set; default=null;}
     public string zone_detect {get; set; default=null;}
-    public string experimental {get; set; default="";}
+    public string mag_sanity {get; set; default=null;}
+    public bool say_bearing {get; set; default=true;}
+
     public signal void settings_update (string s);
 
     public MWPSettings()
@@ -342,9 +344,17 @@ public class MWPSettings : GLib.Object
                 zone_detect = null;
         }
 
-        if(s == null || s == "experimental")
-            experimental = settings.get_string("experimental");
+        if(s == null || s == "mag-sanity")
+        {
+            mag_sanity = settings.get_string("mag-sanity");
+            if (mag_sanity == "")
+                mag_sanity = null;
+        }
+
+        if(s == null || s == "say-bearing")
+            say_bearing = settings.get_boolean("say-bearing");
     }
+
 
     public void save_pane()
     {
