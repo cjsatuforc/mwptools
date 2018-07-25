@@ -20,6 +20,7 @@ nzero = nfile = nlog = 0
 ARGV.each do |bbox|
   idx = 1
   vbox = true
+  nfile += 1
   while vbox do
     cmd = "blackbox_decode"
     cmd << " --index #{idx}"
@@ -70,7 +71,6 @@ ARGV.each do |bbox|
 	    if zerosat == false
 	      puts "****** #{bbox} index = #{idx}"
 	      zerosat = true
-	      nfile += 1
 	    end
 	    nzero += 1
 	    set = rt - frec[:et]

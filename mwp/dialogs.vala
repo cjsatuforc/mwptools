@@ -2021,6 +2021,9 @@ public class AudioThread : Object {
                                 case 10:
                                     s = "Landed";
                                     break;
+                                case 11:
+                                    s = "Emergency landing";
+                                    break;
                             }
                             break;
                         case Vox.DURATION:
